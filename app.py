@@ -13,6 +13,33 @@ COULEUR_AVERTISSEMENT = "#D68910"
 
 st.set_page_config(page_title="Gestion de Tontine", page_icon="🧵", layout="wide")
 
+# --- PWA : rend l'application installable sur PC et mobile (icône, manifest, service worker) ---
+st.markdown("""
+<script>
+(function() {
+    const head = window.parent.document.head;
+
+    function ajouterBalise(tag, attrs) {
+        const selecteur = attrs.rel ? `link[rel="${attrs.rel}"]` : `meta[name="${attrs.name}"]`;
+        if (head.querySelector(selecteur)) return;
+        const el = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+        head.appendChild(el);
+    }
+
+    ajouterBalise('link', {rel: 'manifest', href: 'app/static/manifest.json'});
+    ajouterBalise('link', {rel: 'apple-touch-icon', href: 'app/static/icon-192.png'});
+    ajouterBalise('meta', {name: 'theme-color', content: '#1B2A41'});
+    ajouterBalise('meta', {name: 'apple-mobile-web-app-capable', content: 'yes'});
+    ajouterBalise('meta', {name: 'apple-mobile-web-app-title', content: 'Tontine App'});
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('app/static/sw.js').catch(() => {});
+    }
+})();
+</script>
+""", unsafe_allow_html=True)
+
 st.markdown(f"""
 <style>
 [data-testid="stSidebar"] {{ background-color: {COULEUR_SIDEBAR}; }}
