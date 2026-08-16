@@ -2,6 +2,7 @@ import io
 import psycopg2
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -14,10 +15,12 @@ COULEUR_AVERTISSEMENT = "#D68910"
 st.set_page_config(page_title="Gestion de Tontine", page_icon="🧵", layout="wide")
 
 # --- PWA : rend l'application installable sur PC et mobile (icône, manifest, service worker) ---
-st.markdown("""
+# Important : on utilise components.html (et non st.markdown) car les balises <script>
+# insérées via markdown/innerHTML ne s'exécutent jamais dans les navigateurs, par sécurité.
+components.html("""
 <script>
 (function() {
-    const doc = (function() { try { return window.parent.document; } catch (e) { return document; } })();
+    const doc = window.parent.document;
     const MANIFEST_HREF = 'app/static/manifest.json';
 
     function forcerManifest() {
@@ -53,12 +56,12 @@ st.markdown("""
     });
     observateur.observe(doc.head, {childList: true, subtree: true});
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('app/static/sw.js').catch(function() {});
+    if ('serviceWorker' in doc.defaultView.navigator) {
+        doc.defaultView.navigator.serviceWorker.register('app/static/sw.js').catch(function() {});
     }
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=0, width=0)
 
 st.markdown(f"""
 <style>
