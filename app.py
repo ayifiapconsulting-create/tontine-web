@@ -17,24 +17,44 @@ st.set_page_config(page_title="Gestion de Tontine", page_icon="🧵", layout="wi
 st.markdown("""
 <script>
 (function() {
-    const head = window.parent.document.head;
+    const doc = (function() { try { return window.parent.document; } catch (e) { return document; } })();
+    const MANIFEST_HREF = 'app/static/manifest.json';
 
-    function ajouterBalise(tag, attrs) {
-        const selecteur = attrs.rel ? `link[rel="${attrs.rel}"]` : `meta[name="${attrs.name}"]`;
-        if (head.querySelector(selecteur)) return;
-        const el = document.createElement(tag);
-        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
-        head.appendChild(el);
+    function forcerManifest() {
+        // Supprime le manifest par défaut de Streamlit Cloud (qui propose "Install Streamlit")
+        // et le remplace par le nôtre.
+        doc.querySelectorAll('link[rel="manifest"]').forEach(function(el) { el.remove(); });
+        const link = doc.createElement('link');
+        link.rel = 'manifest';
+        link.href = MANIFEST_HREF;
+        doc.head.appendChild(link);
     }
 
-    ajouterBalise('link', {rel: 'manifest', href: 'app/static/manifest.json'});
-    ajouterBalise('link', {rel: 'apple-touch-icon', href: 'app/static/icon-192.png'});
-    ajouterBalise('meta', {name: 'theme-color', content: '#1B2A41'});
-    ajouterBalise('meta', {name: 'apple-mobile-web-app-capable', content: 'yes'});
-    ajouterBalise('meta', {name: 'apple-mobile-web-app-title', content: 'Tontine App'});
+    function ajouterSiAbsent(tag, attrs) {
+        const selecteur = attrs.rel ? `link[rel="${attrs.rel}"]` : `meta[name="${attrs.name}"]`;
+        if (doc.head.querySelector(selecteur)) return;
+        const el = doc.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+        doc.head.appendChild(el);
+    }
+
+    forcerManifest();
+    ajouterSiAbsent('link', {rel: 'apple-touch-icon', href: 'app/static/icon-192.png'});
+    ajouterSiAbsent('meta', {name: 'theme-color', content: '#1B2A41'});
+    ajouterSiAbsent('meta', {name: 'apple-mobile-web-app-capable', content: 'yes'});
+    ajouterSiAbsent('meta', {name: 'apple-mobile-web-app-title', content: 'Tontine App'});
+
+    // Si Streamlit réinjecte son propre manifest après coup, on reprend la main.
+    const observateur = new MutationObserver(function() {
+        const manifest = doc.head.querySelector('link[rel="manifest"]');
+        if (!manifest || manifest.getAttribute('href').indexOf('static/manifest.json') === -1) {
+            forcerManifest();
+        }
+    });
+    observateur.observe(doc.head, {childList: true, subtree: true});
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('app/static/sw.js').catch(() => {});
+        navigator.serviceWorker.register('app/static/sw.js').catch(function() {});
     }
 })();
 </script>
