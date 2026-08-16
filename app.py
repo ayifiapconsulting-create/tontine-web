@@ -1,4 +1,5 @@
 import io
+import os
 import psycopg2
 import pandas as pd
 import streamlit as st
@@ -77,7 +78,13 @@ div[data-testid="stMetric"] {{ background-color: #FFFFFF; border: 1px solid #D7D
 # CONNEXION BASE DE DONNÉES (PostgreSQL)
 # ==========================================
 def get_connection():
-    return psycopg2.connect(st.secrets["DATABASE_URL"])
+    # Fonctionne à la fois sur Streamlit Cloud (st.secrets) et sur Render.com
+    # ou tout autre hébergeur (variable d'environnement DATABASE_URL).
+    try:
+        database_url = st.secrets["DATABASE_URL"]
+    except Exception:
+        database_url = os.environ.get("DATABASE_URL")
+    return psycopg2.connect(database_url)
 
 @st.cache_resource
 def get_cached_connection():
