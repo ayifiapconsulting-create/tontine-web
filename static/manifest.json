@@ -2,33 +2,33 @@
   "name": "Tontine App - AVIGREF",
   "short_name": "Tontine App",
   "description": "Gestion de tontine pour l'achat de pagnes",
-  "start_url": ".",
-  "scope": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#F4F6F9",
   "theme_color": "#1B2A41",
   "icons": [
     {
-      "src": "app/static/icon-192.png",
+      "src": "/app/static/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "app/static/icon-192.png",
+      "src": "/app/static/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "app/static/icon-512.png",
+      "src": "/app/static/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "app/static/icon-512.png",
+      "src": "/app/static/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
